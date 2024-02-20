@@ -1,4 +1,4 @@
-package com.liuyouyan.yyoj.common.enumeration;
+package com.liuyouyan.yyoj.common.exception;
 
 /**
  * 自定义错误码
@@ -6,7 +6,7 @@ package com.liuyouyan.yyoj.common.enumeration;
  * @author <a href="https://liuyouyan.com">刘有颜</a>
  * @from <a href="https://liuyouyan.com">刘有颜的博客</a>
  */
-public enum ErrorCodeEnum {
+public enum ErrorCode {
 
     SUCCESS(0, "ok"),
     PARAMS_ERROR(40000, "请求参数错误"),
@@ -27,7 +27,7 @@ public enum ErrorCodeEnum {
      */
     private final String message;
 
-    ErrorCodeEnum(int code, String message) {
+    ErrorCode(int code, String message) {
         this.code = code;
         this.message = message;
     }

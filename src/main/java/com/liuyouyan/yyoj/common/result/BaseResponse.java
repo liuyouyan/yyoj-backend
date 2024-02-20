@@ -2,7 +2,7 @@ package com.liuyouyan.yyoj.common.result;
 
 import java.io.Serializable;
 
-import com.liuyouyan.yyoj.common.enumeration.ErrorCodeEnum;
+import com.liuyouyan.yyoj.common.exception.ErrorCode;
 import lombok.Data;
 
 /**
@@ -31,7 +31,7 @@ public class BaseResponse<T> implements Serializable {
         this(code, data, "");
     }
 
-    public BaseResponse(ErrorCodeEnum errorCodeEnum) {
-        this(errorCodeEnum.getCode(), null, errorCodeEnum.getMessage());
+    public BaseResponse(ErrorCode errorCode) {
+        this(errorCode.getCode(), null, errorCode.getMessage());
     }
 }

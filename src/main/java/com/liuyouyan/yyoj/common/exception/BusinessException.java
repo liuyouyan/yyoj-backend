@@ -1,7 +1,5 @@
 package com.liuyouyan.yyoj.common.exception;
 
-import com.liuyouyan.yyoj.common.enumeration.ErrorCodeEnum;
-
 /**
  * 自定义异常类
  *
@@ -20,14 +18,14 @@ public class BusinessException extends RuntimeException {
         this.code = code;
     }
 
-    public BusinessException(ErrorCodeEnum errorCodeEnum) {
-        super(errorCodeEnum.getMessage());
-        this.code = errorCodeEnum.getCode();
+    public BusinessException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.code = errorCode.getCode();
     }
 
-    public BusinessException(ErrorCodeEnum errorCodeEnum, String message) {
+    public BusinessException(ErrorCode errorCode, String message) {
         super(message);
-        this.code = errorCodeEnum.getCode();
+        this.code = errorCode.getCode();
     }
 
     public int getCode() {

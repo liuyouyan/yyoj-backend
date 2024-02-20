@@ -1,7 +1,7 @@
 package com.liuyouyan.yyoj.handler;
 
 import com.liuyouyan.yyoj.common.exception.BusinessException;
-import com.liuyouyan.yyoj.common.enumeration.ErrorCodeEnum;
+import com.liuyouyan.yyoj.common.exception.ErrorCode;
 import com.liuyouyan.yyoj.common.result.BaseResponse;
 import com.liuyouyan.yyoj.common.result.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +27,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public BaseResponse<?> runtimeExceptionHandler(RuntimeException e) {
         log.error("RuntimeException", e);
-        return ResultUtils.error(ErrorCodeEnum.SYSTEM_ERROR, "系统错误");
+        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, "系统错误");
     }
 }

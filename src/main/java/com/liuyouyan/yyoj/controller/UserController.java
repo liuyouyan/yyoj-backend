@@ -5,14 +5,14 @@ import com.liuyouyan.yyoj.common.annotation.AuthCheck;
 import com.liuyouyan.yyoj.config.WxOpenConfig;
 import com.liuyouyan.yyoj.common.constant.UserConstant;
 import com.liuyouyan.yyoj.common.exception.BusinessException;
-import com.liuyouyan.yyoj.common.utils.ThrowExceptionUtils;
+import com.liuyouyan.yyoj.common.exception.ThrowUtils;
 import com.liuyouyan.yyoj.model.entity.User;
 import com.liuyouyan.yyoj.model.vo.UserVO;
 import com.liuyouyan.yyoj.service.UserService;
 import com.liuyouyan.yyoj.service.impl.UserServiceImpl;
 import com.liuyouyan.yyoj.common.result.BaseResponse;
 import com.liuyouyan.yyoj.common.result.DeleteRequest;
-import com.liuyouyan.yyoj.common.enumeration.ErrorCodeEnum;
+import com.liuyouyan.yyoj.common.exception.ErrorCode;
 import com.liuyouyan.yyoj.common.result.ResultUtils;
 import com.liuyouyan.yyoj.model.dto.user.UserAddRequest;
 import com.liuyouyan.yyoj.model.dto.user.UserLoginRequest;
@@ -69,7 +69,7 @@ public class UserController {
     @PostMapping("/register")
     public BaseResponse<Long> userRegister(@RequestBody UserRegisterRequest userRegisterRequest) {
         if (userRegisterRequest == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String userAccount = userRegisterRequest.getUserAccount();
         String userPassword = userRegisterRequest.getUserPassword();
@@ -91,12 +91,12 @@ public class UserController {
     @PostMapping("/login")
     public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         String userAccount = userLoginRequest.getUserAccount();
         String userPassword = userLoginRequest.getUserPassword();
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
         return ResultUtils.success(loginUserVO);
@@ -116,12 +116,12 @@ public class UserController {
             String unionId = userInfo.getUnionId();
             String mpOpenId = userInfo.getOpenid();
             if (StringUtils.isAnyBlank(unionId, mpOpenId)) {
-                throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, "登录失败，系统错误");
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR, "登录失败，系统错误");
             }
             return ResultUtils.success(userService.userLoginByMpOpen(userInfo, request));
         } catch (Exception e) {
             log.error("userLoginByWxOpen error", e);
-            throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR, "登录失败，系统错误");
+            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "登录失败，系统错误");
         }
     }
 
@@ -134,7 +134,7 @@ public class UserController {
     @PostMapping("/logout")
     public BaseResponse<Boolean> userLogout(HttpServletRequest request) {
         if (request == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         boolean result = userService.userLogout(request);
         return ResultUtils.success(result);
@@ -167,7 +167,7 @@ public class UserController {
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest, HttpServletRequest request) {
         if (userAddRequest == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);
@@ -176,7 +176,7 @@ public class UserController {
         String encryptPassword = DigestUtils.md5DigestAsHex((UserServiceImpl.SALT + defaultPassword).getBytes());
         user.setUserPassword(encryptPassword);
         boolean result = userService.save(user);
-        ThrowExceptionUtils.throwIf(!result, ErrorCodeEnum.OPERATION_ERROR);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(user.getId());
     }
 
@@ -191,7 +191,7 @@ public class UserController {
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         boolean b = userService.removeById(deleteRequest.getId());
         return ResultUtils.success(b);
@@ -209,12 +209,12 @@ public class UserController {
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest,
             HttpServletRequest request) {
         if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = new User();
         BeanUtils.copyProperties(userUpdateRequest, user);
         boolean result = userService.updateById(user);
-        ThrowExceptionUtils.throwIf(!result, ErrorCodeEnum.OPERATION_ERROR);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 
@@ -229,10 +229,10 @@ public class UserController {
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<User> getUserById(long id, HttpServletRequest request) {
         if (id <= 0) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User user = userService.getById(id);
-        ThrowExceptionUtils.throwIf(user == null, ErrorCodeEnum.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(user == null, ErrorCode.NOT_FOUND_ERROR);
         return ResultUtils.success(user);
     }
 
@@ -279,12 +279,12 @@ public class UserController {
     public BaseResponse<Page<UserVO>> listUserVOByPage(@RequestBody UserQueryRequest userQueryRequest,
             HttpServletRequest request) {
         if (userQueryRequest == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         long current = userQueryRequest.getCurrent();
         long size = userQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowExceptionUtils.throwIf(size > 20, ErrorCodeEnum.PARAMS_ERROR);
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<User> userPage = userService.page(new Page<>(current, size),
                 userService.getQueryWrapper(userQueryRequest));
         Page<UserVO> userVOPage = new Page<>(current, size, userPage.getTotal());
@@ -306,14 +306,14 @@ public class UserController {
     public BaseResponse<Boolean> updateMyUser(@RequestBody UserUpdateMyRequest userUpdateMyRequest,
             HttpServletRequest request) {
         if (userUpdateMyRequest == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
         User user = new User();
         BeanUtils.copyProperties(userUpdateMyRequest, user);
         user.setId(loginUser.getId());
         boolean result = userService.updateById(user);
-        ThrowExceptionUtils.throwIf(!result, ErrorCodeEnum.OPERATION_ERROR);
+        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 }

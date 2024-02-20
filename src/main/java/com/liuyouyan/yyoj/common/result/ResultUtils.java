@@ -1,6 +1,6 @@
 package com.liuyouyan.yyoj.common.result;
 
-import com.liuyouyan.yyoj.common.enumeration.ErrorCodeEnum;
+import com.liuyouyan.yyoj.common.exception.ErrorCode;
 
 /**
  * 返回工具类
@@ -24,11 +24,11 @@ public class ResultUtils {
     /**
      * 失败
      *
-     * @param errorCodeEnum
+     * @param errorCode
      * @return
      */
-    public static BaseResponse error(ErrorCodeEnum errorCodeEnum) {
-        return new BaseResponse<>(errorCodeEnum);
+    public static BaseResponse error(ErrorCode errorCode) {
+        return new BaseResponse<>(errorCode);
     }
 
     /**
@@ -45,10 +45,10 @@ public class ResultUtils {
     /**
      * 失败
      *
-     * @param errorCodeEnum
+     * @param errorCode
      * @return
      */
-    public static BaseResponse error(ErrorCodeEnum errorCodeEnum, String message) {
-        return new BaseResponse(errorCodeEnum.getCode(), null, message);
+    public static BaseResponse error(ErrorCode errorCode, String message) {
+        return new BaseResponse(errorCode.getCode(), null, message);
     }
 }

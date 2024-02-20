@@ -2,14 +2,14 @@ package com.liuyouyan.yyoj.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.liuyouyan.yyoj.common.exception.BusinessException;
-import com.liuyouyan.yyoj.common.utils.ThrowExceptionUtils;
+import com.liuyouyan.yyoj.common.exception.ThrowUtils;
 import com.liuyouyan.yyoj.model.entity.Post;
 import com.liuyouyan.yyoj.model.entity.User;
 import com.liuyouyan.yyoj.service.PostFavourService;
 import com.liuyouyan.yyoj.service.PostService;
 import com.liuyouyan.yyoj.service.UserService;
 import com.liuyouyan.yyoj.common.result.BaseResponse;
-import com.liuyouyan.yyoj.common.enumeration.ErrorCodeEnum;
+import com.liuyouyan.yyoj.common.exception.ErrorCode;
 import com.liuyouyan.yyoj.common.result.ResultUtils;
 import com.liuyouyan.yyoj.model.dto.post.PostQueryRequest;
 import com.liuyouyan.yyoj.model.dto.postfavour.PostFavourAddRequest;
@@ -55,7 +55,7 @@ public class PostFavourController {
     public BaseResponse<Integer> doPostFavour(@RequestBody PostFavourAddRequest postFavourAddRequest,
             HttpServletRequest request) {
         if (postFavourAddRequest == null || postFavourAddRequest.getPostId() <= 0) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         // 登录才能操作
         final User loginUser = userService.getLoginUser(request);
@@ -74,13 +74,13 @@ public class PostFavourController {
     public BaseResponse<Page<PostVO>> listMyFavourPostByPage(@RequestBody PostQueryRequest postQueryRequest,
             HttpServletRequest request) {
         if (postQueryRequest == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         User loginUser = userService.getLoginUser(request);
         long current = postQueryRequest.getCurrent();
         long size = postQueryRequest.getPageSize();
         // 限制爬虫
-        ThrowExceptionUtils.throwIf(size > 20, ErrorCodeEnum.PARAMS_ERROR);
+        ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<Post> postPage = postFavourService.listFavourPostByPage(new Page<>(current, size),
                 postService.getQueryWrapper(postQueryRequest), loginUser.getId());
         return ResultUtils.success(postService.getPostVOPage(postPage, request));
@@ -96,13 +96,13 @@ public class PostFavourController {
     public BaseResponse<Page<PostVO>> listFavourPostByPage(@RequestBody PostFavourQueryRequest postFavourQueryRequest,
             HttpServletRequest request) {
         if (postFavourQueryRequest == null) {
-            throw new BusinessException(ErrorCodeEnum.PARAMS_ERROR);
+            throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
         long current = postFavourQueryRequest.getCurrent();
         long size = postFavourQueryRequest.getPageSize();
         Long userId = postFavourQueryRequest.getUserId();
         // 限制爬虫
-        ThrowExceptionUtils.throwIf(size > 20 || userId == null, ErrorCodeEnum.PARAMS_ERROR);
+        ThrowUtils.throwIf(size > 20 || userId == null, ErrorCode.PARAMS_ERROR);
         Page<Post> postPage = postFavourService.listFavourPostByPage(new Page<>(current, size),
                 postService.getQueryWrapper(postFavourQueryRequest.getPostQueryRequest()), userId);
         return ResultUtils.success(postService.getPostVOPage(postPage, request));

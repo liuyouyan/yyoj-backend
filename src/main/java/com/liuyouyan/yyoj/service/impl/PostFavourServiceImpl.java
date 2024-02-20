@@ -12,7 +12,7 @@ import com.liuyouyan.yyoj.model.entity.PostFavour;
 import com.liuyouyan.yyoj.model.entity.User;
 import com.liuyouyan.yyoj.service.PostFavourService;
 import com.liuyouyan.yyoj.service.PostService;
-import com.liuyouyan.yyoj.common.enumeration.ErrorCodeEnum;
+import com.liuyouyan.yyoj.common.exception.ErrorCode;
 
 import javax.annotation.Resource;
 import org.springframework.aop.framework.AopContext;
@@ -44,7 +44,7 @@ public class PostFavourServiceImpl extends ServiceImpl<PostFavourMapper, PostFav
         // 判断是否存在
         Post post = postService.getById(postId);
         if (post == null) {
-            throw new BusinessException(ErrorCodeEnum.NOT_FOUND_ERROR);
+            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR);
         }
         // 是否已帖子收藏
         long userId = loginUser.getId();
@@ -92,7 +92,7 @@ public class PostFavourServiceImpl extends ServiceImpl<PostFavourMapper, PostFav
                         .update();
                 return result ? -1 : 0;
             } else {
-                throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR);
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR);
             }
         } else {
             // 未帖子收藏
@@ -105,7 +105,7 @@ public class PostFavourServiceImpl extends ServiceImpl<PostFavourMapper, PostFav
                         .update();
                 return result ? 1 : 0;
             } else {
-                throw new BusinessException(ErrorCodeEnum.SYSTEM_ERROR);
+                throw new BusinessException(ErrorCode.SYSTEM_ERROR);
             }
         }
     }
